@@ -1,5 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { createFileRoute as _unused } from "@tanstack/react-router";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { business } from "@/config/business";
 import { generalMessages } from "@/lib/whatsapp";

@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { CTASection } from "@/components/CTASection";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
-import { PeruMap } from "@/routes/index";
+import { PeruMap } from "@/components/PeruMap";
 import { generalMessages } from "@/lib/whatsapp";
 
 export const Route = createFileRoute("/distribucion")({
