@@ -10,12 +10,30 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ContactoRouteImport } from './routes/contacto'
+import { Route as DistribucionRouteImport } from './routes/distribucion'
+import { Route as NosotrosRouteImport } from './routes/nosotros'
 import { Route as ProductosIndexRouteImport } from './routes/productos.index'
 import { Route as ProductosIdRouteImport } from './routes/productos.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactoRoute = ContactoRouteImport.update({
+  id: '/contacto',
+  path: '/contacto',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DistribucionRoute = DistribucionRouteImport.update({
+  id: '/distribucion',
+  path: '/distribucion',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NosotrosRoute = NosotrosRouteImport.update({
+  id: '/nosotros',
+  path: '/nosotros',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProductosIndexRoute = ProductosIndexRouteImport.update({
@@ -31,30 +49,61 @@ const ProductosIdRoute = ProductosIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/contacto': typeof ContactoRoute
+  '/distribucion': typeof DistribucionRoute
+  '/nosotros': typeof NosotrosRoute
   '/productos/$id': typeof ProductosIdRoute
   '/productos/': typeof ProductosIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/contacto': typeof ContactoRoute
+  '/distribucion': typeof DistribucionRoute
+  '/nosotros': typeof NosotrosRoute
   '/productos/$id': typeof ProductosIdRoute
   '/productos': typeof ProductosIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/contacto': typeof ContactoRoute
+  '/distribucion': typeof DistribucionRoute
+  '/nosotros': typeof NosotrosRoute
   '/productos/$id': typeof ProductosIdRoute
   '/productos/': typeof ProductosIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/productos/$id' | '/productos/'
+  fullPaths:
+    | '/'
+    | '/contacto'
+    | '/distribucion'
+    | '/nosotros'
+    | '/productos/$id'
+    | '/productos/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/productos/$id' | '/productos'
-  id: '__root__' | '/' | '/productos/$id' | '/productos/'
+  to:
+    | '/'
+    | '/contacto'
+    | '/distribucion'
+    | '/nosotros'
+    | '/productos/$id'
+    | '/productos'
+  id:
+    | '__root__'
+    | '/'
+    | '/contacto'
+    | '/distribucion'
+    | '/nosotros'
+    | '/productos/$id'
+    | '/productos/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ContactoRoute: typeof ContactoRoute
+  DistribucionRoute: typeof DistribucionRoute
+  NosotrosRoute: typeof NosotrosRoute
   ProductosIdRoute: typeof ProductosIdRoute
   ProductosIndexRoute: typeof ProductosIndexRoute
 }
@@ -66,6 +115,27 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contacto': {
+      id: '/contacto'
+      path: '/contacto'
+      fullPath: '/contacto'
+      preLoaderRoute: typeof ContactoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/distribucion': {
+      id: '/distribucion'
+      path: '/distribucion'
+      fullPath: '/distribucion'
+      preLoaderRoute: typeof DistribucionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/nosotros': {
+      id: '/nosotros'
+      path: '/nosotros'
+      fullPath: '/nosotros'
+      preLoaderRoute: typeof NosotrosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/productos/': {
@@ -87,6 +157,9 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ContactoRoute: ContactoRoute,
+  DistribucionRoute: DistribucionRoute,
+  NosotrosRoute: NosotrosRoute,
   ProductosIdRoute: ProductosIdRoute,
   ProductosIndexRoute: ProductosIndexRoute,
 }
