@@ -24,7 +24,7 @@ export function Logo({ variant = "dark" }: { variant?: "dark" | "light" }) {
         <img
           src={logoAsset.url}
           alt="FORZIX Herrajes y Accesorios"
-          className="h-9 w-auto"
+          className="h-11 w-auto"
         />
       </span>
     </Link>
