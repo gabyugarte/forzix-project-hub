@@ -11,7 +11,7 @@ export function Navbar() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
-      <div className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center gap-4 px-4 py-3 sm:px-6 lg:px-8">
+      <div className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center gap-2 px-4 py-0 sm:px-6 lg:px-8">
         <Logo />
 
         <div className="flex items-center gap-2">
@@ -22,7 +22,7 @@ export function Navbar() {
                 to={link.to}
                 activeOptions={{ exact: link.to === "/" }}
                 activeProps={{ className: "text-primary" }}
-                className="rounded-md px-3 py-2 text-sm font-semibold text-foreground transition-colors hover:text-primary"
+                className="rounded-md px-2 py-1.5 text-lg font-semibold text-foreground transition-colors hover:text-primary"
               >
                 {link.label}
               </Link>

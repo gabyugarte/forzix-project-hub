@@ -1,12 +1,6 @@
 import { Link } from "@tanstack/react-router";
-import logoAsset from "@/assets/logo-forzix.jpg.asset.json";
+import logoAsset from "@/assets/logo-forzix-transparente.png";
 
-/**
- * Logo oficial de FORZIX.
- *
- * El asset se sirve desde Lovable CDN. Para fondos oscuros (variant="light")
- * se envuelve en un fondo blanco para mantener la legibilidad del negro del logo.
- */
 export function Logo({ variant = "dark" }: { variant?: "dark" | "light" }) {
   const isLight = variant === "light";
 
@@ -22,9 +16,9 @@ export function Logo({ variant = "dark" }: { variant?: "dark" | "light" }) {
         }`}
       >
         <img
-          src={logoAsset.url}
+          src={logoAsset}
           alt="FORZIX Herrajes y Accesorios"
-          className="h-12 w-auto"
+          className="h-35 w-auto"
         />
       </span>
     </Link>
