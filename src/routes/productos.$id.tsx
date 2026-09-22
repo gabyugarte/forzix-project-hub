@@ -1,39 +1,69 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
-import { categoryName, formatPrice, getProduct } from "@/data/products";
+import { getProductBySlug } from "@/lib/catalog";
 import { productMessage, generalMessages } from "@/lib/whatsapp";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import { CTASection } from "@/components/CTASection";
+import bisagras from "@/assets/products/bisagras.jpg";
+import correderas from "@/assets/products/correderas.jpg";
+import pistones from "@/assets/products/pistones.jpg";
+import pushOpen from "@/assets/products/push-open.jpg";
+import tiradorBarra from "@/assets/products/tirador-barra.jpg";
+import correderaCierreLento from "@/assets/products/corredera-cierre-lento.jpg";
+
+
+const productImageMap: Record<string, string> = {
+  bisagras,
+  correderas,
+  pistones,
+  "push-open": pushOpen,
+  "tirador-barra-acero-inoxidable": tiradorBarra,
+  "corredera-cierre-lento": correderaCierreLento,
+  "corredera-push-open": correderas,
+};
 
 export const Route = createFileRoute("/productos/$id")({
-  loader: ({ params }) => {
-    const product = getProduct(params.id);
+  loader: async ({ params }) => {
+    const product = await getProductBySlug(params.id);
     if (!product) throw notFound();
     return { product };
   },
-  head: ({ loaderData, params }) => {
-    if (!loaderData) {
-      return {
-        meta: [
-          { title: "Producto no disponible | FORZIX" },
-          { name: "robots", content: "noindex" },
-        ],
-      };
-    }
-    const { product } = loaderData;
-    const title = `${product.name} | FORZIX Herrajes y Accesorios`;
+head: async ({ loaderData, params }) => {
+  if (!loaderData) {
     return {
       meta: [
-        { title },
-        { name: "description", content: product.description },
-        { property: "og:title", content: title },
-        { property: "og:description", content: product.description },
-        { property: "og:type", content: "product" },
-        { property: "og:url", content: `/productos/${params.id}` },
+        { title: "Producto no disponible | FORZIX" },
+        { name: "robots", content: "noindex" },
       ],
-      links: [{ rel: "canonical", href: `/productos/${params.id}` }],
     };
-  },
+  }
+
+  const { product } = loaderData;
+  const title = `${product.name} | FORZIX Herrajes y Accesorios`;
+
+  return {
+    meta: [
+      { title },
+      {
+        name: "description",
+        content: product.description ?? "",
+      },
+      { property: "og:title", content: title },
+      {
+        property: "og:description",
+        content: product.description ?? "",
+      },
+      { property: "og:type", content: "product" },
+      { property: "og:url", content: `/productos/${params.id}` },
+    ],
+    links: [
+      {
+        rel: "canonical",
+        href: `/productos/${params.id}`,
+      },
+    ],
+  };
+},
   component: ProductoDetalle,
 });
 
@@ -55,7 +85,7 @@ function ProductoDetalle() {
       <section className="mx-auto grid max-w-7xl gap-10 px-4 py-8 sm:px-6 lg:grid-cols-2 lg:gap-14 lg:px-8 lg:py-12">
         <div className="rounded-lg border border-border bg-surface p-6 sm:p-10">
           <img
-            src={product.image}
+            src={product.image_url ?? productImageMap[product.slug] ?? "/placeholder.svg"}
             alt={product.name}
             width={1024}
             height={1024}
@@ -64,7 +94,7 @@ function ProductoDetalle() {
         </div>
 
         <div>
-          <p className="section-eyebrow">{categoryName(product.category)}</p>
+          <p className="section-eyebrow">{product.category.name}</p>
           <h1 className="mt-3 font-display text-3xl font-extrabold sm:text-4xl">{product.name}</h1>
           <p className="mt-4 text-base leading-relaxed text-muted-foreground">
             {product.description}
@@ -73,12 +103,12 @@ function ProductoDetalle() {
           <dl className="mt-8 divide-y divide-border border-y border-border text-sm">
             <div className="flex items-baseline justify-between gap-4 py-4">
               <dt className="text-muted-foreground">Precio de referencia</dt>
-              <dd className="font-display text-2xl font-extrabold">{formatPrice(product)}</dd>
+              <dd className="font-display text-2xl font-extrabold">{product.currency} {product.price.toFixed(2)}</dd>
             </div>
-            {product.productCode && (
+            {product.product_code && (
               <div className="flex items-baseline justify-between gap-4 py-4">
                 <dt className="text-muted-foreground">Código de producto</dt>
-                <dd className="font-semibold">{product.productCode}</dd>
+                <dd className="font-semibold">{product.product_code}</dd>
               </div>
             )}
             <div className="flex items-baseline justify-between gap-4 py-4">
@@ -90,18 +120,32 @@ function ProductoDetalle() {
           </dl>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <WhatsAppButton message={productMessage(product)} size="lg" className="w-full sm:w-auto">
-              Pedir por WhatsApp
-            </WhatsAppButton>
-            <WhatsAppButton
-              message={generalMessages.cotizacion}
-              variant="outline"
-              size="lg"
-              showIcon={false}
-              className="w-full sm:w-auto"
-            >
-              Solicitar cotización
-            </WhatsAppButton>
+<WhatsAppButton
+  message={productMessage(
+    product.product_code
+      ? {
+          name: product.name,
+          productCode: product.product_code,
+        }
+      : {
+          name: product.name,
+        },
+  )}
+  size="lg"
+  className="w-full sm:w-auto"
+>
+  Pedir por WhatsApp
+</WhatsAppButton>
+
+<WhatsAppButton
+  message={generalMessages.cotizacion}
+  variant="outline"
+  size="lg"
+  showIcon={false}
+  className="w-full sm:w-auto"
+>
+  Solicitar cotización
+</WhatsAppButton>
           </div>
         </div>
       </section>
