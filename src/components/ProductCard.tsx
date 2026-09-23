@@ -8,7 +8,7 @@ export function ProductCard({ product }: { product: Product }) {
     <article className="group flex flex-col overflow-hidden rounded-lg border border-border bg-card shadow-card transition-shadow duration-200 hover:shadow-card-hover">
       <Link
         to="/productos/$id"
-        params={{ id: product.id }}
+        params={{ id: product.slug ?? product.id }}
         className="block bg-surface p-5"
         aria-label={`Ver detalle de ${product.name}`}
       >
@@ -29,7 +29,7 @@ export function ProductCard({ product }: { product: Product }) {
         <h3 className="mt-2 font-display text-lg font-bold leading-snug">
           <Link
             to="/productos/$id"
-            params={{ id: product.id }}
+            params={{ id: product.slug ?? product.id }}
             className="transition-colors hover:text-primary"
           >
             {product.name}

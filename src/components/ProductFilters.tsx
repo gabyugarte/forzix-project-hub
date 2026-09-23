@@ -11,7 +11,7 @@ interface Props {
   category: FilterValue;
   onCategoryChange: (value: FilterValue) => void;
   categories: CatalogCategory[];
-  products: Product[];
+products: Product[];
 }
 
 export function ProductFilters({
@@ -80,7 +80,7 @@ export function ProductFilters({
                     {product.name}
                   </p>
 
-               {product.productCode && (
+{product.productCode && (
   <p className="mt-0.5 text-xs text-muted-foreground">
     {product.productCode}
   </p>

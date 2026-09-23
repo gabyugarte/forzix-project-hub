@@ -34,6 +34,7 @@ export interface Category {
 
 export interface Product {
   id: string;
+  slug?: string;
   name: string;
   category: CategorySlug;
   description: string;

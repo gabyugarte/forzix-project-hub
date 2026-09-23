@@ -6,8 +6,16 @@ export function CategoryCard({ category }: { category: Category }) {
   return (
     <Link
       to="/productos"
-      search={{ categoria: category.slug }}
-      className="group flex items-center gap-4 rounded-lg border border-border bg-card p-4 shadow-card transition-all duration-200 hover:border-primary hover:shadow-card-hover sm:flex-col sm:items-start sm:p-5"
+search={{
+  categoria: category.slug as
+    | "todos"
+    | "bisagras"
+    | "correderas"
+    | "pistones"
+    | "push-open"
+    | "tiradores"
+    | "accesorios",
+}}      className="group flex items-center gap-4 rounded-lg border border-border bg-card p-4 shadow-card transition-all duration-200 hover:border-primary hover:shadow-card-hover sm:flex-col sm:items-start sm:p-5"
     >
       <div className="grid h-20 w-20 shrink-0 place-items-center rounded-md bg-surface sm:h-auto sm:w-full">
         <img

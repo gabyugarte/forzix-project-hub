@@ -79,3 +79,22 @@ export async function getProductBySlug(
 
   return data;
 }
+
+export async function getFeaturedProducts(): Promise<CatalogProduct[]> {
+  const { data, error } = await supabase
+    .from("products")
+    .select(`
+      *,
+      category:categories(*)
+    `)
+    .eq("available", true)
+    .eq("featured", true)
+    .order("display_order", { ascending: true });
+
+  if (error) {
+    console.error("Error loading featured products:", error);
+    throw error;
+  }
+
+  return data ?? [];
+}

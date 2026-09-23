@@ -6,10 +6,46 @@ import { ProductGrid } from "@/components/ProductGrid";
 import { CTASection } from "@/components/CTASection";
 import { PeruMap } from "@/components/PeruMap";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
-import { categories, products } from "@/data/products";
+import { getCategories, getFeaturedProducts } from "@/lib/catalog";
 import { generalMessages } from "@/lib/whatsapp";
+import type { Product } from "@/data/products";
+import bisagras from "@/assets/products/bisagras.jpg";
+import correderas from "@/assets/products/correderas.jpg";
+import pistones from "@/assets/products/pistones.jpg";
+import pushOpen from "@/assets/products/push-open.jpg";
+import tiradorBarra from "@/assets/products/tirador-barra.jpg";
+import accesorios from "@/assets/products/accesorios.jpg";
+import correderaCierreLento from "@/assets/products/corredera-cierre-lento.jpg";
+
+const categoryImageMap: Record<string, string> = {
+  bisagras,
+  correderas,
+  pistones,
+  "push-open": pushOpen,
+  tiradores: tiradorBarra,
+  accesorios,
+};
+
+const productImageMap: Record<string, string> = {
+  bisagras,
+  "corredera-cierre-lento": correderaCierreLento,
+  pistones,
+  "tirador-barra-acero-inoxidable": tiradorBarra,
+};
 
 export const Route = createFileRoute("/")({
+  loader: async () => {
+    const [categories, featuredProducts] = await Promise.all([
+      getCategories(),
+      getFeaturedProducts(),
+    ]);
+
+    return {
+      categories,
+      featuredProducts,
+    };
+  },
+
   head: () => ({
     meta: [
       { title: "FORZIX | Herrajes y Accesorios para Muebles" },
@@ -56,7 +92,25 @@ const benefits = [
 ];
 
 function Index() {
-  const featured = products.slice(0, 6);
+  const { categories, featuredProducts } = Route.useLoaderData();
+
+const featured: Product[] = featuredProducts.map((product) => ({
+  id: product.id,
+  slug: product.slug,
+  name: product.name,
+  category: product.category.slug as Product["category"],
+  description: product.description ?? "",
+  price: product.price,
+  currency: product.currency,
+  image:
+  product.image_url ??
+  productImageMap[product.slug] ??
+  "/placeholder.svg",
+  ...(product.product_code
+    ? { productCode: product.product_code }
+    : {}),
+  available: product.available,
+}));
 
   return (
     <>
@@ -68,9 +122,20 @@ function Index() {
           Encuentra lo que necesitas
         </h2>
         <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {categories.map((category) => (
-            <CategoryCard key={category.slug} category={category} />
-          ))}
+{categories.map((category) => (
+  <CategoryCard
+    key={category.slug}
+    category={{
+      slug: category.slug as Product["category"],
+      name: category.name,
+      description: category.description ?? "",
+      image:
+        category.image_url ??
+        categoryImageMap[category.slug] ??
+        "/placeholder.svg",
+    }}
+  />
+))}
         </div>
       </section>
 
@@ -80,7 +145,7 @@ function Index() {
             <div>
               <p className="section-eyebrow section-eyebrow-line">Catálogo</p>
               <h2 className="mt-4 font-display text-3xl font-extrabold sm:text-4xl">
-                Nuestros productos
+                Productos destacados
               </h2>
             </div>
             <Link

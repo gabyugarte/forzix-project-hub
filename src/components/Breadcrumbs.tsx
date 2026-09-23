@@ -1,6 +1,7 @@
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link, useMatch, useRouterState } from "@tanstack/react-router";
+import { categoryName } from "@/data/products";
 import { ChevronRight, Home } from "lucide-react";
-import { categoryName, getProduct } from "@/data/products";
+
 
 const routeLabels: Record<string, string> = {
   "/": "Inicio",
@@ -11,6 +12,10 @@ const routeLabels: Record<string, string> = {
 };
 
 export function Breadcrumbs() {
+  const productRoute = useMatch({
+  from: "/productos/$id",
+  shouldThrow: false,
+});
   const pathname = useRouterState({
     select: (state) => state.location.pathname,
   });
@@ -28,19 +33,19 @@ export function Breadcrumbs() {
   const productMatch = pathname.match(/^\/productos\/([^/]+)$/);
 
   if (productMatch) {
-  const productId = productMatch[1];
+const productSlug = productMatch[1];
 
-if (!productId) {
+if (!productSlug) {
   return null;
 }
 
-const product = getProduct(productId);
+const product = productRoute?.loaderData?.product;
 
-    if (!product) {
-      return null;
-    }
+if (!product) {
+  return null;
+}
 
-    const category = categoryName(product.category);
+const category = product.category.name;
 
     return (
       <nav
@@ -78,7 +83,16 @@ const product = getProduct(productId);
           <li>
             <Link
               to="/productos"
-              search={{ categoria: product.category }}
+              search={{
+  categoria: product.category.slug as
+    | "todos"
+    | "bisagras"
+    | "correderas"
+    | "pistones"
+    | "push-open"
+    | "tiradores"
+    | "accesorios",
+}}
               className="font-medium text-muted-foreground transition-colors hover:text-primary"
             >
               {category}
@@ -102,12 +116,21 @@ const product = getProduct(productId);
   // Catálogo de productos y categorías
   if (pathname === "/productos") {
     const params = new URLSearchParams(search);
-    const categoria = params.get("categoria");
+const categoria = params.get("categoria");
 
-    const category =
-      categoria && categoria !== "todos"
-        ? categoryName(categoria as Parameters<typeof categoryName>[0])
-        : null;
+const validCategories = [
+  "bisagras",
+  "correderas",
+  "pistones",
+  "push-open",
+  "tiradores",
+  "accesorios",
+] as const;
+
+const category =
+  categoria && validCategories.includes(categoria as (typeof validCategories)[number])
+    ? categoryName(categoria as (typeof validCategories)[number])
+    : null;
 
     return (
       <nav
