@@ -50,7 +50,7 @@ function AdminLoginPage() {
         <div className="rounded-lg border border-border bg-card p-6 shadow-card sm:p-8">
           <div className="text-center">
  <img
-  src="/src/assets/logo-forzix-transparente.png"
+  src={logoForzix}
   alt="FORZIX"
   className="mx-auto h-30 w-auto"
 />
