@@ -16,7 +16,7 @@ export const business = {
   whatsappNumber: "51000000000",
 
   /** PLACEHOLDER: reemplazar por el correo real. */
-  email: "",
+  email: "eldersuncion@gmail.com",
 
   /** PLACEHOLDER: reemplazar por las URLs reales de redes sociales. */
   social: {

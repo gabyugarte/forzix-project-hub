@@ -14,10 +14,14 @@ export function CTASection() {
           y disponibilidad.
         </p>
         <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-          <WhatsAppButton message={generalMessages.contacto} size="lg" />
+          <WhatsAppButton
+  message={generalMessages.contacto}
+  size="lg"
+  className="transition-all duration-300 hover:-translate-y-0.5 hover:brightness-105 hover:shadow-lg"
+/>
           <Link
             to="/productos"
-            className="inline-flex h-14 items-center justify-center rounded-md border-2 border-ink-foreground/25 px-7 text-base font-semibold text-ink-foreground transition-colors hover:border-ink-foreground/60"
+            className="inline-flex h-14 items-center justify-center rounded-md border-2 border-ink-foreground/25 px-7 text-base font-semibold text-ink-foreground transition-all duration-300 hover:-translate-y-0.5 hover:border-ink-foreground/60 hover:bg-ink-foreground/5"
           >
             Ver catálogo
           </Link>

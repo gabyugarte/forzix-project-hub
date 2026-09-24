@@ -9,8 +9,11 @@ export const Route = createFileRoute("/admin/settings")({
 function AdminSettingsPage() {
   const navigate = useNavigate();
 
-  const [whatsappNumber, setWhatsappNumber] = useState("");
-  const [whatsappMessage, setWhatsappMessage] = useState("");
+const [whatsappNumber, setWhatsappNumber] = useState("");
+const [whatsappMessage, setWhatsappMessage] = useState("");
+const [email, setEmail] = useState("");
+const [instagram, setInstagram] = useState("");
+const [facebook, setFacebook] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -29,7 +32,7 @@ function AdminSettingsPage() {
 
       const { data, error } = await supabase
         .from("site_settings")
-        .select("id, whatsapp_number, whatsapp_message")
+        .select("id, whatsapp_number, whatsapp_message, email, instagram, facebook")
         .limit(1)
         .maybeSingle();
 
@@ -40,10 +43,14 @@ function AdminSettingsPage() {
         return;
       }
 
-      if (data) {
-        setWhatsappNumber(data.whatsapp_number ?? "");
-        setWhatsappMessage(data.whatsapp_message ?? "");
-      }
+if (data) {
+  
+  setWhatsappNumber(data.whatsapp_number ?? "");
+  setWhatsappMessage(data.whatsapp_message ?? "");
+  setEmail(data.email ?? "");
+  setInstagram(data.instagram ?? "");
+  setFacebook(data.facebook ?? "");
+}
 
       setLoading(false);
     }
@@ -74,21 +81,27 @@ function AdminSettingsPage() {
     if (existingSettings) {
       const { error } = await supabase
         .from("site_settings")
-        .update({
-          whatsapp_number: whatsappNumber.trim(),
-          whatsapp_message: whatsappMessage.trim(),
-          updated_at: new Date().toISOString(),
-        })
+.update({
+  whatsapp_number: whatsappNumber.trim(),
+  whatsapp_message: whatsappMessage.trim(),
+  email: email.trim(),
+  instagram: instagram.trim(),
+  facebook: facebook.trim(),
+  updated_at: new Date().toISOString(),
+})
         .eq("id", existingSettings.id);
 
       saveError = error;
     } else {
       const { error } = await supabase
         .from("site_settings")
-        .insert({
-          whatsapp_number: whatsappNumber.trim(),
-          whatsapp_message: whatsappMessage.trim(),
-        });
+.insert({
+  whatsapp_number: whatsappNumber.trim(),
+  whatsapp_message: whatsappMessage.trim(),
+  email: email.trim(),
+  instagram: instagram.trim(),
+  facebook: facebook.trim(),
+})
 
       saveError = error;
     }
@@ -103,7 +116,6 @@ function AdminSettingsPage() {
     setSuccess("Configuración guardada correctamente.");
     setSaving(false);
   }
-
   if (loading) {
     return (
       <main className="container mx-auto px-4 py-12">
@@ -161,8 +173,7 @@ function AdminSettingsPage() {
                 setWhatsappNumber(event.target.value)
               }
               placeholder="+51 999 999 999"
-              className="w-full rounded-lg border bg-background px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-primary"
-            />
+className="w-full rounded-lg border bg-white px-4 py-3 text-sm text-black outline-none focus:ring-2 focus:ring-primary"            />
 
             <p className="mt-2 text-xs text-muted-foreground">
               Introduce el número con código de país.
@@ -188,6 +199,60 @@ function AdminSettingsPage() {
               className="w-full resize-none rounded-lg border bg-background px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-primary"
             />
           </div>
+<p className="text-sm text-red-500">
+  DEBUG: {email} | {instagram} | {facebook}
+</p>
+<div>
+  <label
+    htmlFor="email"
+    className="mb-2 block text-sm font-medium"
+  >
+    Email de contacto
+  </label>
+
+  <input
+    id="email"
+    type="email"
+    value={email}
+    onChange={(event) => setEmail(event.target.value)}
+    placeholder="contacto@forzix.com"
+    className="w-full rounded-lg border bg-white px-4 py-3 text-sm text-black outline-none focus:ring-2 focus:ring-primary"
+  />
+</div>
+
+<div>
+  <label
+    htmlFor="instagram"
+    className="mb-2 block text-sm font-medium"
+  >
+    Instagram
+  </label>
+
+  <input
+    id="instagram"
+    type="url"
+    value={instagram}
+    onChange={(event) => setInstagram(event.target.value)}
+    placeholder="https://instagram.com/forzix"
+className="w-full rounded-lg border bg-white px-4 py-3 text-sm text-black outline-none focus:ring-2 focus:ring-primary"  />
+</div>
+
+<div>
+  <label
+    htmlFor="facebook"
+    className="mb-2 block text-sm font-medium"
+  >
+    Facebook
+  </label>
+
+  <input
+    id="facebook"
+    type="url"
+    value={facebook}
+    onChange={(event) => setFacebook(event.target.value)}
+    placeholder="https://facebook.com/forzix"
+className="w-full rounded-lg border bg-white px-4 py-3 text-sm text-black outline-none focus:ring-2 focus:ring-primary"  />
+</div>
 
           {error && (
             <div className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">

@@ -198,9 +198,9 @@ const featured: Product[] = featuredProducts.map((product) => ({
             {benefits.map((benefit) => (
               <li
                 key={benefit.title}
-                className="rounded-lg border border-border bg-card p-6 shadow-card"
+                className="rounded-lg border border-border bg-card p-6 shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-card-hover"
               >
-                <span className="grid h-11 w-11 place-items-center rounded-md bg-accent text-primary">
+                <span className="grid h-11 w-11 place-items-center rounded-md bg-accent text-primary transition-all duration-300 group-hover:scale-110 group-hover:rotate-3">
                   <benefit.icon className="h-6 w-6" aria-hidden="true" />
                 </span>
                 <h3 className="mt-4 font-display text-lg font-bold">{benefit.title}</h3>

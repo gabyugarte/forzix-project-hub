@@ -15,6 +15,7 @@ import { Navbar } from "@/components/Navbar";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { Footer } from "@/components/Footer";
 import { WhatsAppFloat } from "@/components/WhatsAppFloat";
+import { ScrollToTop } from "@/components/ScrollToTop";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
 
@@ -145,6 +146,7 @@ function RootComponent() {
         <Footer />
       </div>
       <WhatsAppFloat />
+      <ScrollToTop />
     </QueryClientProvider>
   );
 }
