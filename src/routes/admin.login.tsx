@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
+import logoForzix from "@/assets/logo-forzix-transparente.png";
 
 export const Route = createFileRoute("/admin/login")({
   head: () => ({

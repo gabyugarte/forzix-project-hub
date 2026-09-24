@@ -15,17 +15,7 @@ import tiradorBarra from "@/assets/products/tirador-barra.jpg";
 import correderaCierreLento from "@/assets/products/corredera-cierre-lento.jpg";
 
 const searchSchema = z.object({
-  categoria: z
-    .enum([
-      "todos",
-      "bisagras",
-      "correderas",
-      "pistones",
-      "push-open",
-      "tiradores",
-      "accesorios",
-    ])
-    .optional(),
+  categoria: z.string().optional(),
 });
 
 export const Route = createFileRoute("/productos/")({

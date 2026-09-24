@@ -25,6 +25,10 @@ const [editingCategory, setEditingCategory] = useState<Category | null>(null);
 const [name, setName] = useState("");
 const [slug, setSlug] = useState("");
 const [description, setDescription] = useState("");
+const [active, setActive] = useState(true);
+const [imageUrl, setImageUrl] = useState("");
+const [imageFile, setImageFile] = useState<File | null>(null);
+const [imagePreview, setImagePreview] = useState("");
 const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -48,7 +52,72 @@ const [saving, setSaving] = useState(false);
     loadCategories();
   }, []);
 
-  async function handleCreateCategory() {
+function getStoragePathFromPublicUrl(url: string | null) {
+  if (!url) {
+    return null;
+  }
+
+  const marker =
+    "/storage/v1/object/public/product-images/";
+
+  const index = url.indexOf(marker);
+
+  if (index === -1) {
+    return null;
+  }
+
+  return decodeURIComponent(
+    url.slice(index + marker.length),
+  );
+}
+
+function handleImageChange(
+  event: React.ChangeEvent<HTMLInputElement>,
+) {
+  const file = event.target.files?.[0];
+
+  if (!file) {
+    return;
+  }
+
+  if (!file.type.startsWith("image/")) {
+    setError("Selecciona un archivo de imagen válido.");
+    return;
+  }
+
+  setImageFile(file);
+  setImagePreview(URL.createObjectURL(file));
+  setError("");
+}
+
+async function uploadCategoryImage(
+  file: File,
+  categoryId: string,
+) {
+  const extension =
+    file.name.split(".").pop()?.toLowerCase() || "jpg";
+
+  const filePath = `categories/${categoryId}-${Date.now()}.${extension}`;
+
+  const { error } = await supabase.storage
+    .from("product-images")
+    .upload(filePath, file, {
+      upsert: false,
+      contentType: file.type,
+    });
+
+  if (error) {
+    throw error;
+  }
+
+  const { data } = supabase.storage
+    .from("product-images")
+    .getPublicUrl(filePath);
+
+  return data.publicUrl;
+}
+
+async function handleCreateCategory() {
   if (!name.trim() || !slug.trim()) {
     setError("El nombre y el identificador son obligatorios.");
     return;
@@ -64,7 +133,8 @@ const [saving, setSaving] = useState(false);
       slug: slug.trim(),
       description: description.trim() || null,
       display_order: categories.length + 1,
-      active: true,
+      active,
+      image_url: null,
     })
     .select()
     .single();
@@ -76,10 +146,68 @@ const [saving, setSaving] = useState(false);
     return;
   }
 
-  setCategories((current) => [...current, data]);
+  let finalCategory = data;
+
+  if (imageFile) {
+    try {
+      const uploadedImageUrl = await uploadCategoryImage(
+        imageFile,
+        data.id,
+      );
+
+      const { data: updatedCategory, error: imageUpdateError } =
+        await supabase
+          .from("categories")
+          .update({
+            image_url: uploadedImageUrl,
+          })
+          .eq("id", data.id)
+          .select()
+          .single();
+
+      if (imageUpdateError) {
+        console.error(
+          "Error saving category image URL:",
+          imageUpdateError,
+        );
+
+        await supabase
+          .from("categories")
+          .delete()
+          .eq("id", data.id);
+
+        setError("No se pudo guardar la imagen de la categoría.");
+        setSaving(false);
+        return;
+      }
+
+      finalCategory = updatedCategory;
+    } catch (imageError) {
+      console.error(
+        "Error uploading category image:",
+        imageError,
+      );
+
+      await supabase
+        .from("categories")
+        .delete()
+        .eq("id", data.id);
+
+      setError("No se pudo subir la imagen de la categoría.");
+      setSaving(false);
+      return;
+    }
+  }
+
+  setCategories((current) => [...current, finalCategory]);
+
   setName("");
   setSlug("");
   setDescription("");
+  setActive(true);
+  setImageUrl("");
+  setImageFile(null);
+  setImagePreview("");
   setShowForm(false);
   setSaving(false);
 }
@@ -89,6 +217,11 @@ function handleEditCategory(category: Category) {
   setName(category.name);
   setSlug(category.slug);
   setDescription(category.description ?? "");
+  setActive(category.active);
+  
+  setImageUrl(category.image_url ?? "");
+  setImageFile(null);
+  setImagePreview(category.image_url ?? "");
   setError("");
   setShowForm(true);
 
@@ -115,12 +248,39 @@ async function handleUpdateCategory() {
   setSaving(true);
   setError("");
 
+  let finalImageUrl = editingCategory.image_url;
+
+  if (imageFile) {
+    try {
+      finalImageUrl = await uploadCategoryImage(
+        imageFile,
+        editingCategory.id,
+      );
+} catch (imageError) {
+  console.error(
+    "Error uploading category image:",
+    imageError,
+  );
+
+  setError(
+    imageError instanceof Error
+      ? imageError.message
+      : "No se pudo subir la nueva imagen.",
+  );
+
+  setSaving(false);
+  return;
+}
+  }
+
   const { data, error } = await supabase
     .from("categories")
     .update({
       name: name.trim(),
       slug: slug.trim(),
       description: description.trim() || null,
+      active,
+      image_url: finalImageUrl,
     })
     .eq("id", editingCategory.id)
     .select()
@@ -133,6 +293,26 @@ async function handleUpdateCategory() {
     return;
   }
 
+  if (imageFile && editingCategory.image_url) {
+    const oldImagePath = getStoragePathFromPublicUrl(
+      editingCategory.image_url,
+    );
+
+    if (oldImagePath) {
+      const { error: deleteOldImageError } =
+        await supabase.storage
+          .from("product-images")
+          .remove([oldImagePath]);
+
+      if (deleteOldImageError) {
+        console.error(
+          "Error deleting old category image:",
+          deleteOldImageError,
+        );
+      }
+    }
+  }
+
   setCategories((current) =>
     current.map((category) =>
       category.id === editingCategory.id ? data : category,
@@ -143,6 +323,10 @@ async function handleUpdateCategory() {
   setName("");
   setSlug("");
   setDescription("");
+  setActive(true);
+  setImageUrl("");
+  setImageFile(null);
+  setImagePreview("");
   setShowForm(false);
   setSaving(false);
 }
@@ -327,6 +511,50 @@ async function handleDeleteCategory(category: Category) {
       />
     </div>
 
+    <div className="mt-5">
+  <label className="mb-2 block text-sm font-medium">
+    Imagen de categoría
+  </label>
+
+  <div className="rounded-lg border bg-background p-4">
+    {imagePreview && (
+      <div className="mb-4">
+        <img
+          src={imagePreview}
+          alt={name || "Vista previa de categoría"}
+          className="h-40 w-full rounded-lg object-cover"
+        />
+      </div>
+    )}
+
+    <input
+      type="file"
+      accept="image/*"
+      onChange={handleImageChange}
+      className="block w-full text-sm text-muted-foreground file:mr-4 file:rounded-lg file:border-0 file:bg-primary file:px-4 file:py-2 file:text-sm file:font-medium file:text-primary-foreground hover:file:opacity-90"
+    />
+
+    <p className="mt-2 text-xs text-muted-foreground">
+      JPG, PNG o WebP. Selecciona una nueva imagen para reemplazar la actual.
+    </p>
+  </div>
+</div>
+<div className="mt-5">
+  <label className="mb-2 block text-sm font-medium">
+    Estado
+  </label>
+
+  <select
+    value={active ? "active" : "inactive"}
+    onChange={(event) =>
+      setActive(event.target.value === "active")
+    }
+    className="w-full rounded-lg border bg-background px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-primary"
+  >
+    <option value="active">Activa</option>
+    <option value="inactive">Inactiva</option>
+  </select>
+</div>
     <div className="mt-6 flex justify-end">
 <button
   type="button"
@@ -344,76 +572,145 @@ async function handleDeleteCategory(category: Category) {
   </div>
 )}
 
-        {!loading && !error && (
-          <div className="overflow-hidden rounded-xl border bg-card">
-            <div className="grid grid-cols-[80px_1fr_140px_120px] gap-4 border-b bg-muted/40 px-6 py-4 text-sm font-semibold">
-              <span>Orden</span>
-              <span>Categoría</span>
-              <span>Estado</span>
-              <span>Acciones</span>
-            </div>
+{!loading && !error && (
+  <>
+    {/* Vista móvil */}
+    <div className="space-y-4 md:hidden">
+      {categories.map((category) => (
+        <div
+          key={category.id}
+          className="rounded-xl border bg-card p-4"
+        >
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              Orden {category.display_order}
+            </p>
 
-            {categories.map((category) => (
-              <div
-                key={category.id}
-                className="grid grid-cols-[80px_1fr_140px_120px] items-center gap-4 border-b px-6 py-5 last:border-b-0"
-              >
-                <span className="text-sm text-muted-foreground">
-                  {category.display_order}
-                </span>
+            <p className="mt-2 break-words text-base font-semibold text-foreground">
+              {category.name}
+            </p>
 
-                <div>
-                  <p className="font-semibold text-foreground">
-                    {category.name}
-                  </p>
-
-<p className="mt-1 text-xs text-muted-foreground">
-  Identificador: {category.slug}
-</p>
-                </div>
-
-<div>
-  <span
-    className={`inline-flex w-fit rounded-full px-3 py-1 text-xs font-medium ${
-      category.active
-        ? "bg-green-100 text-green-700"
-        : "bg-gray-100 text-gray-600"
-    }`}
-  >
-    {category.active ? "Activa" : "Inactiva"}
-  </span>
-
-  <button
-    type="button"
-    onClick={() => handleToggleCategory(category)}
-    className="mt-2 block text-xs font-medium text-primary hover:underline"
-  >
-    {category.active ? "Desactivar" : "Activar"}
-  </button>
-</div>
-
-<div className="space-y-2">
-  <button
-    type="button"
-    onClick={() => handleEditCategory(category)}
-    className="block text-left text-sm font-medium text-primary hover:underline"
-  >
-    Editar
-  </button>
-
-  <button
-    type="button"
-    onClick={() => handleDeleteCategory(category)}
-    className="block text-left text-sm font-medium text-destructive hover:underline"
-  >
-    Eliminar
-  </button>
-</div> 
-
-</div>
-            ))}
+            <p className="mt-1 break-all text-xs text-muted-foreground">
+              Identificador: {category.slug}
+            </p>
           </div>
-        )}
+
+          {category.description && (
+            <div className="mt-4 rounded-lg bg-muted/40 p-3">
+              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                Descripción
+              </p>
+
+              <p className="mt-1 break-words text-sm text-foreground">
+                {category.description}
+              </p>
+            </div>
+          )}
+
+          <div className="mt-4">
+            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              Estado
+            </p>
+
+            <span
+              className={`mt-1 inline-flex w-fit rounded-full px-3 py-1 text-xs font-medium ${
+                category.active
+                  ? "bg-green-100 text-green-700"
+                  : "bg-gray-100 text-gray-600"
+              }`}
+            >
+              {category.active ? "Activa" : "Inactiva"}
+            </span>
+          </div>
+
+          <div className="mt-4 flex items-center gap-5 border-t pt-4">
+            <button
+              type="button"
+              onClick={() => handleEditCategory(category)}
+              className="text-sm font-medium text-primary hover:underline"
+            >
+              Editar
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handleDeleteCategory(category)}
+              className="text-sm font-medium text-destructive hover:underline"
+            >
+              Eliminar
+            </button>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    {/* Tabla escritorio */}
+    <div className="hidden overflow-hidden rounded-xl border bg-card md:block">
+      <div className="grid grid-cols-[70px_1fr_180px_120px_130px] gap-4 border-b bg-muted/40 px-6 py-4 text-sm font-semibold">
+        <span>Orden</span>
+        <span>Categoría</span>
+        <span>Identificador</span>
+        <span>Estado</span>
+        <span>Acciones</span>
+      </div>
+
+      {categories.map((category) => (
+        <div
+          key={category.id}
+          className="grid grid-cols-[70px_1fr_180px_120px_130px] items-center gap-4 border-b px-6 py-5 last:border-b-0"
+        >
+          <span className="text-sm text-muted-foreground">
+            {category.display_order}
+          </span>
+
+          <div>
+            <p className="font-semibold text-foreground">
+              {category.name}
+            </p>
+
+            {category.description && (
+              <p className="mt-1 text-xs text-muted-foreground">
+                {category.description}
+              </p>
+            )}
+          </div>
+
+          <span className="break-all text-sm text-muted-foreground">
+            {category.slug}
+          </span>
+
+          <span
+            className={`inline-flex w-fit rounded-full px-3 py-1 text-xs font-medium ${
+              category.active
+                ? "bg-green-100 text-green-700"
+                : "bg-gray-100 text-gray-600"
+            }`}
+          >
+            {category.active ? "Activa" : "Inactiva"}
+          </span>
+
+          <div className="flex flex-col gap-2">
+            <button
+              type="button"
+              onClick={() => handleEditCategory(category)}
+              className="text-left text-sm font-medium text-primary hover:underline"
+            >
+              Editar
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handleDeleteCategory(category)}
+              className="text-left text-sm font-medium text-destructive hover:underline"
+            >
+              Eliminar
+            </button>
+          </div>
+        </div>
+      ))}
+    </div>
+  </>
+)}
       </div>
     </main>
   );

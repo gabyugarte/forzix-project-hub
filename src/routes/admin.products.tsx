@@ -681,83 +681,178 @@ const productData = {
   </div>
 )}
 
-        {!loading && !error && (
-          <div className="overflow-hidden rounded-xl border bg-card">
-            <div className="grid grid-cols-[70px_1fr_160px_120px_120px_130px] gap-4 border-b bg-muted/40 px-6 py-4 text-sm font-semibold">
-              <span>Orden</span>
-              <span>Producto</span>
-              <span>Categoría</span>
-              <span>Precio</span>
-              <span>Estado</span>
-              <span>Acciones</span>
+{!loading && !error && (
+  <>
+    {/* Vista móvil */}
+    <div className="space-y-4 md:hidden">
+      {products.map((product) => (
+        <div
+          key={product.id}
+          className="rounded-xl border bg-card p-4"
+        >
+          <div className="flex items-start justify-between gap-4">
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                Orden {product.display_order}
+              </p>
+
+              <p className="mt-2 break-words text-base font-semibold text-foreground">
+                {product.name}
+              </p>
+
+              <p className="mt-1 break-all text-xs text-muted-foreground">
+                Código: {product.product_code ?? "Sin código"}
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-4 rounded-lg bg-muted/40 p-3">
+            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              Categoría
+            </p>
+
+            <p className="mt-1 break-words text-sm font-medium text-foreground">
+              {product.category?.name ?? "Sin categoría"}
+            </p>
+          </div>
+
+          <div className="mt-4 grid grid-cols-2 gap-3">
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                Precio
+              </p>
+
+              <p className="mt-1 text-sm font-medium">
+                {product.currency} {product.price.toFixed(2)}
+              </p>
             </div>
 
-            {products.map((product) => (
-              <div
-                key={product.id}
-                className="grid grid-cols-[70px_1fr_160px_120px_120px_130px] items-center gap-4 border-b px-6 py-5 last:border-b-0"
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                Estado
+              </p>
+
+              <span
+                className={`mt-1 inline-flex w-fit rounded-full px-3 py-1 text-xs font-medium ${
+                  product.available
+                    ? "bg-green-100 text-green-700"
+                    : "bg-gray-100 text-gray-600"
+                }`}
               >
-                <span className="text-sm text-muted-foreground">
-                  {product.display_order}
-                </span>
-
-                <div>
-                  <p className="font-semibold text-foreground">
-                    {product.name}
-                  </p>
-
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    Código: {product.product_code ?? "Sin código"}
-                  </p>
-                </div>
-
-                <span className="text-sm text-muted-foreground">
-                  {product.category?.name ?? "Sin categoría"}
-                </span>
-
-                <span className="text-sm font-medium">
-                  {product.currency} {product.price.toFixed(2)}
-                </span>
-
-                <div>
-                  <span
-                    className={`inline-flex w-fit rounded-full px-3 py-1 text-xs font-medium ${
-                      product.available
-                        ? "bg-green-100 text-green-700"
-                        : "bg-gray-100 text-gray-600"
-                    }`}
-                  >
-                    {product.available ? "Disponible" : "No disponible"}
-                  </span>
-
-                  {product.featured && (
-                    <span className="mt-2 block text-xs font-medium text-primary">
-                      ★ Destacado
-                    </span>
-                  )}
-                </div>
-
-<div className="flex flex-col gap-2">
-  <button
-    type="button"
-    onClick={() => handleEditProduct(product)}
-    className="text-left text-sm font-medium text-primary hover:underline"
-  >
-    Editar
-  </button>
-
-  <button
-    type="button"
-    onClick={() => handleDeleteProduct(product)}
-    className="text-left text-sm font-medium text-destructive hover:underline"
-  >
-    Eliminar
-  </button>
-</div>
-              </div>
-            ))}
+                {product.available
+                  ? "Disponible"
+                  : "No disponible"}
+              </span>
+            </div>
           </div>
-        )}
+
+          {product.featured && (
+            <p className="mt-3 text-xs font-medium text-primary">
+              ★ Producto destacado
+            </p>
+          )}
+
+          <div className="mt-4 flex items-center gap-5 border-t pt-4">
+            <button
+              type="button"
+              onClick={() => handleEditProduct(product)}
+              className="text-sm font-medium text-primary hover:underline"
+            >
+              Editar
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handleDeleteProduct(product)}
+              className="text-sm font-medium text-destructive hover:underline"
+            >
+              Eliminar
+            </button>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    {/* Tabla escritorio */}
+    <div className="hidden overflow-hidden rounded-xl border bg-card md:block">
+      <div className="grid grid-cols-[70px_1fr_160px_120px_120px_130px] gap-4 border-b bg-muted/40 px-6 py-4 text-sm font-semibold">
+        <span>Orden</span>
+        <span>Producto</span>
+        <span>Categoría</span>
+        <span>Precio</span>
+        <span>Estado</span>
+        <span>Acciones</span>
+      </div>
+
+      {products.map((product) => (
+        <div
+          key={product.id}
+          className="grid grid-cols-[70px_1fr_160px_120px_120px_130px] items-center gap-4 border-b px-6 py-5 last:border-b-0"
+        >
+          <span className="text-sm text-muted-foreground">
+            {product.display_order}
+          </span>
+
+          <div>
+            <p className="font-semibold text-foreground">
+              {product.name}
+            </p>
+
+            <p className="mt-1 text-xs text-muted-foreground">
+              Código: {product.product_code ?? "Sin código"}
+            </p>
+          </div>
+
+          <span className="text-sm text-muted-foreground">
+            {product.category?.name ?? "Sin categoría"}
+          </span>
+
+          <span className="text-sm font-medium">
+            {product.currency} {product.price.toFixed(2)}
+          </span>
+
+          <div>
+            <span
+              className={`inline-flex w-fit rounded-full px-3 py-1 text-xs font-medium ${
+                product.available
+                  ? "bg-green-100 text-green-700"
+                  : "bg-gray-100 text-gray-600"
+              }`}
+            >
+              {product.available
+                ? "Disponible"
+                : "No disponible"}
+            </span>
+
+            {product.featured && (
+              <span className="mt-2 block text-xs font-medium text-primary">
+                ★ Destacado
+              </span>
+            )}
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <button
+              type="button"
+              onClick={() => handleEditProduct(product)}
+              className="text-left text-sm font-medium text-primary hover:underline"
+            >
+              Editar
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handleDeleteProduct(product)}
+              className="text-left text-sm font-medium text-destructive hover:underline"
+            >
+              Eliminar
+            </button>
+          </div>
+        </div>
+      ))}
+    </div>
+  </>
+)}
       </div>
     </main>
   );
