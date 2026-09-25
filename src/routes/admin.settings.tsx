@@ -199,9 +199,7 @@ className="w-full rounded-lg border bg-white px-4 py-3 text-sm text-black outlin
               className="w-full resize-none rounded-lg border bg-background px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-primary"
             />
           </div>
-<p className="text-sm text-red-500">
-  DEBUG: {email} | {instagram} | {facebook}
-</p>
+
 <div>
   <label
     htmlFor="email"
