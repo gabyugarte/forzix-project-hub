@@ -37,6 +37,7 @@ export interface Product {
   slug?: string;
   name: string;
   category: CategorySlug;
+  subcategory?: string;
   description: string;
   /** Precio de referencia. Reemplazar por el precio real. */
   price: number;

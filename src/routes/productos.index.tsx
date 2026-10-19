@@ -1,10 +1,14 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 import { ProductFilters, type FilterValue } from "@/components/ProductFilters";
 import { ProductGrid } from "@/components/ProductGrid";
 import { CTASection } from "@/components/CTASection";
-import { getProducts, getCategories } from "@/lib/catalog";
+import {
+  getProducts,
+  getCategories,
+  getSubcategories,
+} from "@/lib/catalog";
 import type { Product } from "@/data/products";
 
 import bisagras from "@/assets/products/bisagras.jpg";
@@ -16,16 +20,18 @@ import correderaCierreLento from "@/assets/products/corredera-cierre-lento.jpg";
 
 const searchSchema = z.object({
   categoria: z.string().optional(),
+  subcategoria: z.string().optional(),
 });
 
 export const Route = createFileRoute("/productos/")({
   validateSearch: searchSchema,
 
   loader: async () => {
-  const [catalogProducts, categories] = await Promise.all([
-    getProducts(),
-    getCategories(),
-  ]);
+const [catalogProducts, categories, subcategories] = await Promise.all([
+  getProducts(),
+  getCategories(),
+  getSubcategories(),
+]);
 
     const imageMap: Record<string, string> = {
       bisagras,
@@ -41,17 +47,21 @@ const products: Product[] = catalogProducts.map((product) => ({
   id: product.slug,
   name: product.name,
   category: product.category.slug as Product["category"],
+  subcategory: product.subcategory?.slug ?? "",
   description: product.description ?? "",
   price: product.price,
   currency: product.currency,
-  image: product.image_url ?? imageMap[product.slug] ?? correderas,
+  image:
+  product.image_url?.trim() ||
+  imageMap[product.slug] ||
+  correderas,
   ...(product.product_code
     ? { productCode: product.product_code }
     : {}),
   available: product.available,
 }));
 
-    return { products, categories };
+    return { products, categories, subcategories };
   },
 
   head: () => ({
@@ -78,30 +88,73 @@ const products: Product[] = catalogProducts.map((product) => ({
 });
 
 function ProductosPage() {
-  const { categoria } = Route.useSearch();
-  const { products, categories } = Route.useLoaderData();
+  const { categoria, subcategoria: subcategoriaURL } = Route.useSearch();
+  const { products, categories, subcategories } = Route.useLoaderData();
 
   const [query, setQuery] = useState("");
+
   const [category, setCategory] = useState<FilterValue>(
     categoria ?? "todos",
   );
 
-  const filtered = useMemo(() => {
-    const term = query.trim().toLowerCase();
+  const [subcategory, setSubcategory] = useState<string>(
+    subcategoriaURL ?? "todos",
+  );
 
-    return products.filter((product) => {
-      const matchCategory =
-        category === "todos" || product.category === category;
+  useEffect(() => {
+  setCategory(categoria ?? "todos");
+  setSubcategory(subcategoriaURL ?? "todos");
+}, [categoria, subcategoriaURL]);
 
-      const matchQuery =
-  term === "" ||
-  product.name.toLowerCase().includes(term) ||
-  product.description.toLowerCase().includes(term) ||
-  product.productCode?.toLowerCase().includes(term);
+const navigate = Route.useNavigate();
 
-      return matchCategory && matchQuery;
-    });
-  }, [products, query, category]);
+const handleCategoryChange = (value: FilterValue) => {
+  setCategory(value);
+  setSubcategory("todos");
+
+  navigate({
+    search: (prev) => ({
+      ...prev,
+      categoria: value === "todos" ? undefined : value,
+      subcategoria: undefined,
+    }),
+    replace: true,
+  });
+};
+
+const handleSubcategoryChange = (value: string) => {
+  setSubcategory(value);
+
+  navigate({
+    search: (prev) => ({
+      ...prev,
+      subcategoria: value === "todos" ? undefined : value,
+    }),
+    replace: true,
+  });
+};
+
+const filtered = useMemo(() => {
+  const term = query.trim().toLowerCase();
+
+  return products.filter((product) => {
+    const matchCategory =
+      category === "todos" || product.category === category;
+
+    const matchSubcategory =
+      subcategory === "todos" ||
+      product.subcategory === subcategory;
+
+    const matchQuery =
+      term === "" ||
+      product.name.toLowerCase().includes(term) ||
+      product.description.toLowerCase().includes(term) ||
+      product.productCode?.toLowerCase().includes(term);
+
+    return matchCategory && matchSubcategory && matchQuery;
+  });
+}, [products, query, category, subcategory]);
+
 
   return (
     <>
@@ -126,8 +179,11 @@ function ProductosPage() {
   query={query}
   onQueryChange={setQuery}
   category={category}
-  onCategoryChange={setCategory}
+  onCategoryChange={handleCategoryChange}
+  subcategory={subcategory}
+  onSubcategoryChange={handleSubcategoryChange}
   categories={categories}
+  subcategories={subcategories}
   products={products}
 />
 

@@ -111,6 +111,19 @@ function AdminPage() {
 
   </Link>
 
+  <Link
+    to="/admin/subcategories"
+    className="rounded-lg border border-border bg-card p-6 shadow-card transition hover:-translate-y-1 hover:shadow-lg"
+  >
+    <h2 className="font-display text-xl font-extrabold">
+      Subcategorías
+    </h2>
+
+    <p className="mt-2 text-sm text-muted-foreground">
+      Crear, editar y organizar las subcategorías de cada familia de productos.
+    </p>
+  </Link>
+
 </div>
 
 

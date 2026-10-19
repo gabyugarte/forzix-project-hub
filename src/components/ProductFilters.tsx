@@ -1,7 +1,15 @@
+
 import { Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { CatalogCategory } from "@/lib/catalog";
 import type { Product } from "@/data/products";
+
+interface CatalogSubcategory {
+  id: string;
+  name: string;
+  slug: string;
+  category_id: string;
+}
 
 export type FilterValue = string | "todos";
 
@@ -10,8 +18,11 @@ interface Props {
   onQueryChange: (value: string) => void;
   category: FilterValue;
   onCategoryChange: (value: FilterValue) => void;
+  subcategory: string;
+  onSubcategoryChange: (value: string) => void;
   categories: CatalogCategory[];
-products: Product[];
+  subcategories: CatalogSubcategory[];
+  products: Product[];
 }
 
 export function ProductFilters({
@@ -19,7 +30,10 @@ export function ProductFilters({
   onQueryChange,
   category,
   onCategoryChange,
+  subcategory,
+  onSubcategoryChange,
   categories,
+  subcategories,
   products,
 }: Props) {
   const options: { value: FilterValue; label: string }[] = [
@@ -29,6 +43,17 @@ export function ProductFilters({
       label: c.name,
     })),
   ];
+
+  const filteredSubcategories =
+    category === "todos"
+      ? []
+      : subcategories.filter((subcategory) => {
+          const selectedCategory = categories.find(
+            (item) => item.slug === category,
+          );
+
+          return selectedCategory?.id === subcategory.category_id;
+        });
 
   const suggestions =
     query.trim().length >= 2
@@ -80,11 +105,11 @@ export function ProductFilters({
                     {product.name}
                   </p>
 
-{product.productCode && (
-  <p className="mt-0.5 text-xs text-muted-foreground">
-    {product.productCode}
-  </p>
-)}
+                  {product.productCode && (
+                    <p className="mt-0.5 text-xs text-muted-foreground">
+                      {product.productCode}
+                    </p>
+                  )}
                 </div>
               </button>
             ))}
@@ -92,6 +117,7 @@ export function ProductFilters({
         )}
       </div>
 
+      {/* Categorías principales */}
       <div
         role="group"
         aria-label="Filtrar por categoría"
@@ -118,6 +144,56 @@ export function ProductFilters({
           );
         })}
       </div>
+
+      {/* Subcategorías de la categoría seleccionada */}
+      {filteredSubcategories.length > 0 && (
+        <div className="space-y-3">
+          <p className="text-sm font-semibold text-foreground">
+            Filtrar por subcategoría
+          </p>
+
+          <div
+            role="group"
+            aria-label="Filtrar por subcategoría"
+            className="flex flex-wrap gap-2"
+          >
+            <button
+              type="button"
+              aria-pressed={subcategory === "todos"}
+              onClick={() => onSubcategoryChange("todos")}
+              className={cn(
+                "h-10 rounded-md border px-4 text-sm font-medium transition-colors",
+                subcategory === "todos"
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : "border-border bg-card text-foreground hover:border-primary hover:text-primary",
+              )}
+            >
+              Todas
+            </button>
+
+            {filteredSubcategories.map((item) => {
+              const active = subcategory === item.slug;
+
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  aria-pressed={active}
+                  onClick={() => onSubcategoryChange(item.slug)}
+                  className={cn(
+                    "h-10 rounded-md border px-4 text-sm font-medium transition-colors",
+                    active
+                      ? "border-primary bg-primary text-primary-foreground"
+                      : "border-border bg-card text-foreground hover:border-primary hover:text-primary",
+                  )}
+                >
+                  {item.name}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

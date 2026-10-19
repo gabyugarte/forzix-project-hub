@@ -69,6 +69,9 @@ head: async ({ loaderData, params }) => {
 
 function ProductoDetalle() {
   const { product } = Route.useLoaderData();
+  
+const variants = product.variants ?? [];
+
 
   return (
     <>
@@ -146,11 +149,125 @@ function ProductoDetalle() {
 >
   Solicitar cotización
 </WhatsAppButton>
+
           </div>
         </div>
       </section>
 
+      {variants.length > 0 && (
+        <section className="mx-auto max-w-7xl px-4 pb-12 sm:px-6 lg:px-8">
+          <div className="mb-6">
+            <p className="section-eyebrow">Opciones disponibles</p>
+            <h2 className="mt-2 font-display text-2xl font-extrabold sm:text-3xl">
+              Variantes del producto
+            </h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Consulta las referencias y características disponibles.
+            </p>
+          </div>
+
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {variants.map((variant) => {
+              const attributes = variant.attributes ?? {};
+              const image =
+                variant.variant_image_url ??
+                product.image_url ??
+                productImageMap[product.slug] ??
+                "/placeholder.svg";
+
+              const variantName =
+                variant.name?.trim() || variant.sku;
+
+              return (
+                <article
+                  key={variant.id}
+                  className="overflow-hidden rounded-lg border border-border bg-surface transition hover:shadow-md"
+                >
+                  <div className="flex aspect-[4/3] items-center justify-center bg-white p-5">
+                    <img
+                      src={image}
+                      alt={`${product.name} - ${variantName}`}
+                      loading="lazy"
+                      className="h-full w-full object-contain"
+                    />
+                  </div>
+
+                  <div className="p-5">
+                    <h3 className="font-display text-lg font-extrabold">
+                      {variantName}
+                    </h3>
+
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      Referencia: {variant.sku}
+                    </p>
+
+                    {attributes.medida && (
+                      <p className="mt-3 text-sm">
+                        <span className="text-muted-foreground">
+                          Medida:{" "}
+                        </span>
+                        <span className="font-medium">
+                          {attributes.medida}
+                        </span>
+                      </p>
+                    )}
+
+                    {attributes.acabado && (
+                      <p className="mt-1 text-sm">
+                        <span className="text-muted-foreground">
+                          Acabado:{" "}
+                        </span>
+                        <span className="font-medium">
+                          {attributes.acabado}
+                        </span>
+                      </p>
+                    )}
+
+                    {attributes.color && (
+                      <p className="mt-1 text-sm">
+                        <span className="text-muted-foreground">
+                          Color:{" "}
+                        </span>
+                        <span className="font-medium">
+                          {attributes.color}
+                        </span>
+                      </p>
+                    )}
+
+                    <div className="mt-4 border-t border-border pt-4">
+                      {variant.price !== null &&
+                      variant.price !== undefined ? (
+                        <p className="font-display text-xl font-extrabold">
+                          {variant.currency || product.currency}{" "}
+                          {Number(variant.price).toFixed(2)}
+                        </p>
+                      ) : (
+                        <p className="text-sm text-muted-foreground">
+                          Consultar precio
+                        </p>
+                      )}
+
+                      <WhatsAppButton
+                        message={productMessage({
+                          name: product.name,
+                          productCode: variant.sku,
+                        })}
+                        size="lg"
+                        className="mt-4 w-full"
+                      >
+                        Consultar esta variante
+                      </WhatsAppButton>
+                    </div>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
       <CTASection />
+
     </>
   );
 }
