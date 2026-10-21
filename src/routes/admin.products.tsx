@@ -505,7 +505,7 @@ function handleEditProduct(product: Product) {
   setCategoryId(product.category_id);
   setSubcategoryId(product.subcategory_id ?? "");
   setDescription(product.description ?? "");
-  setPrice(String(product.price));
+  setPrice(product.price == null ? "" : String(product.price));
   setCurrency(product.currency);
   setAvailable(product.available);
   setFeatured(product.featured);
@@ -690,7 +690,7 @@ if (imageFile) {
   }
 }
 }
-
+console.log("Precio antes de guardar:", { price, numericPrice });
 const productData = {
   name: name.trim(),
   slug: slug.trim(),
