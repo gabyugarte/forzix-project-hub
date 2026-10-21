@@ -106,7 +106,11 @@ const variants = product.variants ?? [];
           <dl className="mt-8 divide-y divide-border border-y border-border text-sm">
             <div className="flex items-baseline justify-between gap-4 py-4">
               <dt className="text-muted-foreground">Precio de referencia</dt>
-              <dd className="font-display text-2xl font-extrabold">{product.currency} {product.price.toFixed(2)}</dd>
+              <dd className="font-display text-2xl font-extrabold">
+  {product.price !== null && product.price !== undefined
+    ? `${product.currency} ${Number(product.price).toFixed(2)}`
+    : "Consultar precio"}
+</dd>
             </div>
             {product.product_code && (
               <div className="flex items-baseline justify-between gap-4 py-4">

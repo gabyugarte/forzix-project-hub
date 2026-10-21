@@ -9,7 +9,7 @@ interface Product {
   category_id: string;
   subcategory_id: string | null;
   description: string | null;
-  price: number;
+  price: number | null;
   currency: string;
   image_url: string | null;
   product_code: string | null;
@@ -45,8 +45,8 @@ interface ProductVariant {
 
 function getVariantPrice(
   variant: ProductVariant,
-  product: Product,
-): number {
+  product: Product
+): number | null {
   return variant.price ?? product.price;
 }
 
@@ -620,17 +620,15 @@ async function handleSaveProduct() {
     return;
   }
 
-  if (!price.trim()) {
-    setError("El precio es obligatorio.");
-    return;
-  }
+const numericPrice = price.trim() === "" ? null : Number(price);
 
-  const numericPrice = Number(price);
-
-  if (Number.isNaN(numericPrice) || numericPrice < 0) {
-    setError("El precio debe ser un número válido igual o mayor que 0.");
-    return;
-  }
+if (
+  numericPrice !== null &&
+  (!Number.isFinite(numericPrice) || numericPrice < 0)
+) {
+  setError("El precio debe ser un número válido igual o mayor que 0.");
+  return;
+}
 
   const numericDisplayOrder = Number(displayOrder);
 
@@ -1000,11 +998,14 @@ const productData = {
           type="number"
           min="0"
           step="0.01"
-          placeholder="0.00"
+          placeholder="Dejar vacío si está pendiente"
           value={price}
           onChange={(event) => setPrice(event.target.value)}
           className="w-full rounded-lg border bg-background px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-primary"
         />
+        <p className="mt-1 text-xs text-muted-foreground">
+  Opcional. Puedes añadir el precio cuando esté confirmado.
+</p>
       </div>
 
       <div>
@@ -1178,7 +1179,9 @@ const productData = {
 
                <p className="mt-1 text-sm">
   {getVariantCurrency(variant, editingProduct)}{" "}
-  {getVariantPrice(variant, editingProduct).toFixed(2)}
+  {getVariantPrice(variant, editingProduct) !== null
+  ? getVariantPrice(variant, editingProduct)!.toFixed(2)
+  : "Consultar precio"}
   {variant.price === null && (
     <span className="ml-1 text-xs text-muted-foreground">
       (precio general)
@@ -1481,7 +1484,9 @@ const productData = {
               </p>
 
               <p className="mt-1 text-sm font-medium">
-                {product.currency} {product.price.toFixed(2)}
+                {product.price !== null
+  ? `${product.currency} ${product.price.toFixed(2)}`
+  : "Consultar precio"}
               </p>
             </div>
 
@@ -1573,7 +1578,9 @@ const productData = {
         </span>
 
         <span className="text-sm font-medium">
-          {product.currency} {product.price.toFixed(2)}
+          {product.price !== null
+            ? `${product.currency} ${product.price.toFixed(2)}`
+            : "Consultar precio"}
         </span>
 
         <div>

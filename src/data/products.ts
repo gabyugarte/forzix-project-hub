@@ -40,7 +40,7 @@ export interface Product {
   subcategory?: string;
   description: string;
   /** Precio de referencia. Reemplazar por el precio real. */
-  price: number;
+  price: number | null;
   currency: string;
   image: string;
   /** Código interno del producto. Reemplazar por el código real. */
@@ -173,5 +173,9 @@ export const products: Product[] = [
 export const getProduct = (id: string): Product | undefined =>
   products.find((p) => p.id === id);
 
-export const formatPrice = (product: Pick<Product, "price" | "currency">): string =>
-  `${product.currency} ${product.price.toFixed(2)}`;
+export const formatPrice = (
+  product: Pick<Product, "price" | "currency">
+): string =>
+  product.price === null || product.price === undefined
+    ? "Consultar precio"
+    : `${product.currency} ${Number(product.price).toFixed(2)}`;
