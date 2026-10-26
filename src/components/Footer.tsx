@@ -160,7 +160,7 @@ Herrajes y accesorios para la fabricación y montaje de muebles. </p> <p classNa
   {" · "}
   Sitio web desarrollado por{" "}
   <a
-    href="https://gabyugarte.github.io/"
+    href="https://gabrielaugarte.vercel.app/"
     target="_blank"
     rel="noopener noreferrer"
     className="font-medium text-ink-foreground/70 transition-colors hover:text-ink-foreground"
