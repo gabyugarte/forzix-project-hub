@@ -82,9 +82,10 @@ function CotizadorPage() {
   const [search, setSearch] = useState("");
   const [selectedProductId, setSelectedProductId] = useState("");
   const [selectedVariantId, setSelectedVariantId] = useState("");
-  const [quantity, setQuantity] = useState(1);
+  const [quantity, setQuantity] = useState<number | "">(1);
 
   const [items, setItems] = useState<QuoteItem[]>([]);
+  const [quantityDrafts, setQuantityDrafts] = useState<Record<string, string>>({});
   const [generalDiscountType, setGeneralDiscountType] = useState<
   "none" | "percentage" | "fixed"
 >("none");
@@ -462,7 +463,7 @@ const newItem: QuoteItem = {
   code: variant?.sku ?? selectedProduct.product_code ?? "",
   price: Number(unitPrice),
   currency,
-  quantity: Math.max(1, quantity),
+  quantity: Math.max(1, Number(quantity) || 1),
   discount_type: "none",
   discount_value: 0,
 };
@@ -1093,18 +1094,22 @@ async function downloadSavedQuotePdf() {
                 <label className="mt-4 block text-sm font-semibold">
                   Cantidad
                 </label>
-                <input
-                  type="number"
-                  min="1"
-                  step="1"
-                  value={quantity}
-                  onChange={(event) =>
-                    setQuantity(
-                      Math.max(1, Number.parseInt(event.target.value, 10) || 1),
-                    )
-                  }
-                  className="mt-2 w-full rounded-lg border border-border bg-card px-3 py-3 text-sm"
-                />
+<input
+  type="number"
+  min="1"
+  step="1"
+  value={quantity}
+  onChange={(event) => {
+    const value = event.target.value;
+    setQuantity(value === "" ? "" : Number.parseInt(value, 10));
+  }}
+  onBlur={() => {
+    setQuantity((current) =>
+      current === "" || current < 1 ? 1 : current,
+    );
+  }}
+  className="mt-2 w-full rounded-lg border border-border bg-card px-3 py-3 text-sm"
+/>
 
                 <button
                   type="button"
@@ -1177,18 +1182,33 @@ async function downloadSavedQuotePdf() {
     <label className="text-xs text-muted-foreground">
       Cantidad
     </label>
-    <input
-      type="number"
-      min="1"
-      value={item.quantity}
-      onChange={(event) =>
-        updateQuantity(
-          item.id,
-          Number.parseInt(event.target.value, 10) || 1,
-        )
-      }
-      className="mt-1 w-full rounded-lg border border-border bg-background px-2 py-2 text-sm"
-    />
+<input
+  type="number"
+  min="1"
+  step="1"
+  value={quantityDrafts[item.id] ?? String(item.quantity)}
+  onChange={(event) =>
+    setQuantityDrafts((current) => ({
+      ...current,
+      [item.id]: event.target.value,
+    }))
+  }
+  onBlur={() => {
+    const draft = quantityDrafts[item.id];
+    const parsed = Number.parseInt(draft ?? "", 10);
+
+    if (Number.isInteger(parsed) && parsed >= 1) {
+      updateQuantity(item.id, parsed);
+    }
+
+    setQuantityDrafts((current) => {
+      const next = { ...current };
+      delete next[item.id];
+      return next;
+    });
+  }}
+  className="mt-1 w-full rounded-lg border border-border bg-background px-2 py-2 text-sm"
+/>
   </div>
 
   <div>
