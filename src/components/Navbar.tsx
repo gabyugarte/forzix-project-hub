@@ -11,6 +11,7 @@ export function Navbar() {
   const [open, setOpen] = useState(false);
   const [categoriesOpen, setCategoriesOpen] = useState(false);
   const [mobileCategory, setMobileCategory] = useState<string | null>(null);
+  const [mobileProductsOpen, setMobileProductsOpen] = useState(false);
 
   const [categories, setCategories] = useState<
     Awaited<ReturnType<typeof getCategories>>
@@ -172,8 +173,8 @@ export function Navbar() {
 <li className="border-b border-border">
   <button
     type="button"
-    onClick={() => setMobileCategory((current) => current === "productos" ? null : "productos")}
-    aria-expanded={mobileCategory === "productos"}
+    onClick={() => setMobileProductsOpen((current) => !current)}
+    aria-expanded={mobileProductsOpen}
     className="flex w-full items-center justify-between py-4 text-base font-semibold text-foreground"
   >
     Productos
@@ -182,7 +183,7 @@ export function Navbar() {
     />
   </button>
 
-  {mobileCategory === "productos" && (
+  {mobileProductsOpen && (
     <div className="space-y-1 pb-3">
       <Link
         to="/productos"
