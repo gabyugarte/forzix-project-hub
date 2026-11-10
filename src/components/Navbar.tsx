@@ -151,7 +151,7 @@ export function Navbar() {
         <nav
           id="menu-movil"
           aria-label="Navegación móvil"
-          className="border-t border-border bg-background lg:hidden"
+          className="max-h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain border-t border-border bg-background lg:hidden"
         >
           <ul className="mx-auto max-w-7xl px-4 py-2 sm:px-6">
 {navLinks
