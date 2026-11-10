@@ -15,7 +15,10 @@ import { Route as DistribucionRouteImport } from './routes/distribucion'
 import { Route as NosotrosRouteImport } from './routes/nosotros'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminCategoriesRouteImport } from './routes/admin.categories'
+import { Route as AdminCotizadorRouteImport } from './routes/admin.cotizador'
+import { Route as AdminEmpresaRouteImport } from './routes/admin.empresa'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
+import { Route as AdminPresupuestosRouteImport } from './routes/admin.presupuestos'
 import { Route as AdminProductsRouteImport } from './routes/admin.products'
 import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
 import { Route as AdminSubcategoriesRouteImport } from './routes/admin.subcategories'
@@ -52,9 +55,24 @@ const AdminCategoriesRoute = AdminCategoriesRouteImport.update({
   path: '/admin/categories',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminCotizadorRoute = AdminCotizadorRouteImport.update({
+  id: '/admin/cotizador',
+  path: '/admin/cotizador',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminEmpresaRoute = AdminEmpresaRouteImport.update({
+  id: '/admin/empresa',
+  path: '/admin/empresa',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminLoginRoute = AdminLoginRouteImport.update({
   id: '/admin/login',
   path: '/admin/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminPresupuestosRoute = AdminPresupuestosRouteImport.update({
+  id: '/admin/presupuestos',
+  path: '/admin/presupuestos',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminProductsRoute = AdminProductsRouteImport.update({
@@ -89,7 +107,10 @@ export interface FileRoutesByFullPath {
   '/distribucion': typeof DistribucionRoute
   '/nosotros': typeof NosotrosRoute
   '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/cotizador': typeof AdminCotizadorRoute
+  '/admin/empresa': typeof AdminEmpresaRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/presupuestos': typeof AdminPresupuestosRoute
   '/admin/products': typeof AdminProductsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/subcategories': typeof AdminSubcategoriesRoute
@@ -103,7 +124,10 @@ export interface FileRoutesByTo {
   '/distribucion': typeof DistribucionRoute
   '/nosotros': typeof NosotrosRoute
   '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/cotizador': typeof AdminCotizadorRoute
+  '/admin/empresa': typeof AdminEmpresaRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/presupuestos': typeof AdminPresupuestosRoute
   '/admin/products': typeof AdminProductsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/subcategories': typeof AdminSubcategoriesRoute
@@ -118,7 +142,10 @@ export interface FileRoutesById {
   '/distribucion': typeof DistribucionRoute
   '/nosotros': typeof NosotrosRoute
   '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/cotizador': typeof AdminCotizadorRoute
+  '/admin/empresa': typeof AdminEmpresaRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/presupuestos': typeof AdminPresupuestosRoute
   '/admin/products': typeof AdminProductsRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/subcategories': typeof AdminSubcategoriesRoute
@@ -134,7 +161,10 @@ export interface FileRouteTypes {
     | '/distribucion'
     | '/nosotros'
     | '/admin/categories'
+    | '/admin/cotizador'
+    | '/admin/empresa'
     | '/admin/login'
+    | '/admin/presupuestos'
     | '/admin/products'
     | '/admin/settings'
     | '/admin/subcategories'
@@ -148,7 +178,10 @@ export interface FileRouteTypes {
     | '/distribucion'
     | '/nosotros'
     | '/admin/categories'
+    | '/admin/cotizador'
+    | '/admin/empresa'
     | '/admin/login'
+    | '/admin/presupuestos'
     | '/admin/products'
     | '/admin/settings'
     | '/admin/subcategories'
@@ -162,7 +195,10 @@ export interface FileRouteTypes {
     | '/distribucion'
     | '/nosotros'
     | '/admin/categories'
+    | '/admin/cotizador'
+    | '/admin/empresa'
     | '/admin/login'
+    | '/admin/presupuestos'
     | '/admin/products'
     | '/admin/settings'
     | '/admin/subcategories'
@@ -177,7 +213,10 @@ export interface RootRouteChildren {
   DistribucionRoute: typeof DistribucionRoute
   NosotrosRoute: typeof NosotrosRoute
   AdminCategoriesRoute: typeof AdminCategoriesRoute
+  AdminCotizadorRoute: typeof AdminCotizadorRoute
+  AdminEmpresaRoute: typeof AdminEmpresaRoute
   AdminLoginRoute: typeof AdminLoginRoute
+  AdminPresupuestosRoute: typeof AdminPresupuestosRoute
   AdminProductsRoute: typeof AdminProductsRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
   AdminSubcategoriesRoute: typeof AdminSubcategoriesRoute
@@ -230,11 +269,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminCategoriesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/cotizador': {
+      id: '/admin/cotizador'
+      path: '/admin/cotizador'
+      fullPath: '/admin/cotizador'
+      preLoaderRoute: typeof AdminCotizadorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/empresa': {
+      id: '/admin/empresa'
+      path: '/admin/empresa'
+      fullPath: '/admin/empresa'
+      preLoaderRoute: typeof AdminEmpresaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/login': {
       id: '/admin/login'
       path: '/admin/login'
       fullPath: '/admin/login'
       preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/presupuestos': {
+      id: '/admin/presupuestos'
+      path: '/admin/presupuestos'
+      fullPath: '/admin/presupuestos'
+      preLoaderRoute: typeof AdminPresupuestosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/products': {
@@ -281,7 +341,10 @@ const rootRouteChildren: RootRouteChildren = {
   DistribucionRoute: DistribucionRoute,
   NosotrosRoute: NosotrosRoute,
   AdminCategoriesRoute: AdminCategoriesRoute,
+  AdminCotizadorRoute: AdminCotizadorRoute,
+  AdminEmpresaRoute: AdminEmpresaRoute,
   AdminLoginRoute: AdminLoginRoute,
+  AdminPresupuestosRoute: AdminPresupuestosRoute,
   AdminProductsRoute: AdminProductsRoute,
   AdminSettingsRoute: AdminSettingsRoute,
   AdminSubcategoriesRoute: AdminSubcategoriesRoute,

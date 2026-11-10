@@ -64,6 +64,41 @@ function AdminPage() {
         </div>
 
 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+  
+  <Link
+    to="/admin/cotizador"
+    className="rounded-lg border border-border bg-card p-6 shadow-card transition hover:-translate-y-1 hover:shadow-lg"
+  >
+    <h2 className="font-display text-xl font-extrabold">
+      Cotizador
+    </h2>
+    <p className="mt-2 text-sm text-muted-foreground">
+      Crear presupuestos, aplicar descuentos y calcular totales.
+    </p>
+  </Link>
+<Link
+  to="/admin/presupuestos"
+  className="rounded-lg border border-border bg-card p-6 shadow-card transition hover:-translate-y-1 hover:shadow-lg"
+>
+  <h2 className="font-display text-xl font-extrabold">
+    Presupuestos
+  </h2>
+  <p className="mt-2 text-sm text-muted-foreground">
+    Consultar el historial, revisar detalles y descargar presupuestos guardados.
+  </p>
+</Link>
+  <Link
+    to="/admin/empresa"
+    className="rounded-lg border border-border bg-card p-6 shadow-card transition hover:-translate-y-1 hover:shadow-lg"
+  >
+    <h2 className="font-display text-xl font-extrabold">
+      Empresa
+    </h2>
+    <p className="mt-2 text-sm text-muted-foreground">
+      Gestionar los datos corporativos y el logotipo de FORZIX.
+    </p>
+  </Link>
+
   <Link
     to="/admin/products"
     className="rounded-lg border border-border bg-card p-6 shadow-card transition hover:-translate-y-1 hover:shadow-lg"
